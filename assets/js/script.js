@@ -1,6 +1,12 @@
 document.addEventListener('DOMContentLoaded', function () {
+
+
+
+
+    
   const sectionsContainer = document.getElementById('sections-container');
 
+  
   // Enable sortable for menu items on the left side
   const menuItems = document.querySelectorAll('.menu-item');
 
@@ -135,15 +141,34 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // Function to update numbers of the list items
-  function updateListNumbers(list) {
-      const items = list.querySelectorAll('.sortable-list .list-item');
-      items.forEach((item, index) => {
-          const bulletSpan = item.querySelector('.sortable-list .this-wrap .bullet');
-          bulletSpan.textContent = `${index + 1}`; // Update bullet number
-          const textSpan = item.querySelector('.this-wrap .title span:last-child'); // Get the last span for text
-          textSpan.textContent = ` ${textSpan.textContent.trim()}`; // Maintain text formatting
-      });
-  }
+//   function updateListNumbers(list) {
+//       const items = list.querySelectorAll('.sortable-list .list-item');
+//       items.forEach((item, index) => {
+//           const bulletSpan = item.querySelector('.sortable-list .this-wrap .bullet');
+//           bulletSpan.textContent = `${index + 1}`; // Update bullet number
+//           const textSpan = item.querySelector('.this-wrap .title span:last-child'); // Get the last span for text
+//           textSpan.textContent = ` ${textSpan.textContent.trim()}`; // Maintain text formatting
+//       });
+//   }
+
+function updateListNumbers(list) {
+    const items = list.querySelectorAll('.list-item');
+
+    items.forEach((item, index) => {
+        const bulletSpan = item.querySelector('.bullet');
+        const listContainer = item.parentElement;
+
+        // Only number primary list items in `.sortable-list`, remove bullet for `.nested-list`
+        if (listContainer.classList.contains('sortable-list')) {
+            bulletSpan.textContent = `${index + 1}`; // Add numbering for main list
+        } else if (listContainer.classList.contains('nested-list')) {
+            bulletSpan.textContent = ''; // Remove numbering for nested lists
+        }
+
+        const textSpan = item.querySelector('.title span:last-child');
+        textSpan.textContent = ` ${textSpan.textContent.trim()}`; // Maintain text formatting
+    });
+}
 
   // Automatically create Sections 2, 3, and 4 on page load
   const initialSections = ['section2', 'section3'];
@@ -161,4 +186,76 @@ document.addEventListener('DOMContentLoaded', function () {
           makeListSortable(nestedList);
       });
   });
+});
+
+//left list
+document.addEventListener('DOMContentLoaded', function () {
+    const sectionsContainer = document.getElementById('sections-container');
+    const menuList = document.getElementById('menu-list');
+
+    // Enable sortable for menu items on the left side
+    new Sortable(menuList, {
+        animation: 150,
+        onEnd: function () {
+            console.log('Menu item moved!');
+        }
+    });
+
+    const menuItems = document.querySelectorAll('.menu-item');
+
+    menuItems.forEach(item => {
+        item.addEventListener('click', function () {
+            const sectionId = this.getAttribute('data-section');
+            let section = document.getElementById(sectionId);
+
+            if (!section) {
+                section = createSection(sectionId, `SECTION ${sectionId.replace('section', '')}`);
+                sectionsContainer.appendChild(section);
+                makeListSortable(section.querySelector('.sortable-list'));
+            }
+
+            section.scrollIntoView({ behavior: 'smooth' });
+        });
+    });
+
+    // ... (rest of your existing code for section creation and management)
+});
+//Category Tab Section
+document.addEventListener('DOMContentLoaded', function () {
+    const categoryList = document.getElementById('category-list');
+    const tabsContent = document.querySelector('.tabs-content');
+
+    // Function to handle tab click
+    categoryList.addEventListener('click', function (event) {
+        event.preventDefault();
+
+        const target = event.target;
+        const tabClass = target.getAttribute('data-tab');
+
+        // Return if no data-tab attribute is found
+        if (!tabClass) return;
+
+        // Remove 'active' class from all tabs and hide all tab contents
+        document.querySelectorAll('#category-list a').forEach(link => link.classList.remove('active'));
+        document.querySelectorAll('.tabs-content > div').forEach(content => content.style.display = 'none');
+
+        // Add 'active' class to the clicked tab
+        target.classList.add('active');
+
+        // Show the corresponding content by class
+        const selectedContent = tabsContent.querySelector(`.${tabClass}`);
+        if (selectedContent) {
+            selectedContent.style.display = 'block';
+        }
+    });
+
+    // Trigger click on CAT 1 tab to make it active on page load
+    const firstTab = categoryList.querySelector('a[data-tab="tab1"]');
+    if (firstTab) {
+        firstTab.classList.add('active'); // Add active class to CAT 1 link
+        const firstContent = tabsContent.querySelector('.tab1'); // Select CAT 1 content
+        if (firstContent) {
+            firstContent.style.display = 'block'; // Show CAT 1 content
+        }
+    }
 });
