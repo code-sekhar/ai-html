@@ -1,0 +1,8 @@
+@media only screen and (max-width: 768px) and (min-width: 300px) {
+    .left-menu {
+        width: 170px;
+        background-color: #ffffff;
+        padding: 20px;
+        border-right: 1px solid #dfe1e6;
+    }
+}
